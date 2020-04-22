@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 final _auth = FirebaseAuth.instance;
 final _firestore = Firestore.instance;
+FirebaseUser authUser;
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
@@ -14,7 +15,6 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  FirebaseUser authUser;
   String messageText;
 
   final messageTextEditingController = TextEditingController();
@@ -122,7 +122,7 @@ class MessageStream extends StatelessWidget {
           );
         }
 
-        final messages = snapshot.data.documents;
+        final messages = snapshot.data.documents.reversed;
         List<MessageBubble> messageWidgets = [];
         for (var message in messages) {
           messageWidgets.add(
@@ -135,6 +135,7 @@ class MessageStream extends StatelessWidget {
 
         return Expanded(
           child: ListView(
+            reverse: true,
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 25),
             children: messageWidgets,
           ),
@@ -147,20 +148,30 @@ class MessageStream extends StatelessWidget {
 class MessageBubble extends StatelessWidget {
   final String sender;
   final String text;
+  final bool amISender;
 
-  MessageBubble({this.text, this.sender});
+  MessageBubble({this.text, this.sender})
+      : amISender = sender == authUser.email;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(13.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment:
+        amISender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: <Widget>[
           Material(
-            borderRadius: BorderRadius.circular(50),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(50),
+              bottomLeft: amISender ? Radius.circular(50) : Radius.zero,
+              topRight: Radius.circular(50),
+              bottomRight: !amISender ? Radius.circular(50) : Radius.zero,
+            ),
             elevation: 8,
-            color: Colors.lightBlueAccent.shade700,
+            color: amISender
+                ? Colors.lightBlueAccent.shade700
+                : Colors.tealAccent.shade700,
             child: Padding(
               padding:
               const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
