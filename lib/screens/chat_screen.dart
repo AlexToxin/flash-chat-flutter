@@ -56,7 +56,20 @@ class _ChatScreenState extends State<ChatScreen> {
                 Navigator.pop(context);
               }),
         ],
-        title: Text('⚡️Chat'),
+//        title: Text('⚡️Chat'),
+        title: Row(
+          children: <Widget>[
+            Hero(
+              tag: 'logo',
+              child: Container(
+                child: Image.asset('images/logo.png'),
+                height: 30,
+                width: 30,
+              ),
+            ),
+            Text('Chat'),
+          ],
+        ),
         backgroundColor: Colors.lightBlueAccent,
       ),
       body: SafeArea(
